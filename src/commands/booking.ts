@@ -84,7 +84,14 @@ export const selectAvailableDate = (ctx: IBotContext, data: {trainerId: number, 
 
     console.log(trainer);
 
-    bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите время тренировки:', Markup.inlineKeyboard(availableTimeButtons))
+    if (availableTimeButtons.length === 0) {
+        bot.telegram.sendMessage((ctx as any).chat.id, 'На сегодня тренировок нет',  Markup.inlineKeyboard([
+            [buttonsList.selectAnotherTrainer],
+            [buttonsList.goToStart],
+        ]));
+    } else {
+        bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите время тренировки:', Markup.inlineKeyboard(availableTimeButtons));
+    }
 }
 
 export const selectAvailableTime = (ctx: IBotContext, data: {time: number}) => {
