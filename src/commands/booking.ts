@@ -74,7 +74,13 @@ export const selectAvailableDate = (ctx: IBotContext, data: {trainerId: number, 
 
     console.log(availableTimes);
 
-    const availableTimeButtons = availableTimes.map(time => [buttonsList.availableTimeButton(time)])
+    const availableTimeButtons = availableTimes.filter(time => {
+        const date = (ctx.session.currentDate ?? moment()).set({ hour: time });
+
+        const isPast = date.isBefore(moment());
+
+        return !isPast;
+    }).map(time => [buttonsList.availableTimeButton(time)])
 
     console.log(trainer);
 
