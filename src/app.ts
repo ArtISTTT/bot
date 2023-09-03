@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 })
 
 bot.catch((err, ctx) => {
-    console.log(`Ooops, encountered an error for ${ctx.updateType}`, err)
+    console.log(`Ooops, encountered an error for ${ctx.updateType}`, err);
 })
 
 bot.command('start', (ctx: any) => commandOnStart(ctx));

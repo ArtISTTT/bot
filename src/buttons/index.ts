@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { availableTrainers } from './../helpers/availableTrainers';
 import { Markup } from "telegraf"
+import { AvailableSets, RentalPeriod, PreparationType } from '../context.interface';
 
 const stringify = (data: any) => {
     return JSON.stringify(data)
@@ -8,7 +9,109 @@ const stringify = (data: any) => {
 
 const byteSize = (str: string) => new Blob([str]).size;
 
+const equipmentButtons = {
+    equipmentRental: Markup.button.callback(
+        "🎿 Прокат лыж и инвентаря",
+        stringify({
+            type: 'equipmentRental',
+        }),
+    ),
+    equipmentPreparation: Markup.button.callback(
+        "❄️ Подготовка инвентаря для катания ",
+        stringify({
+            type: 'equipmentPreparation',
+        })
+    ),
+    rentPrice: Markup.button.callback(
+        "💰 Стоимость аренды",
+        stringify({
+            type: 'rentPrice',
+        })
+    ),
+    rentalPeriod: Markup.button.callback(
+        "⏱ Срок аренды",
+        stringify({
+            type: 'rentalPeriod',
+        })
+    ),
+    knowAboutExistance: Markup.button.callback(
+        "📝 Узнать о наличии лыж и инвентаря / Арендовать",
+        stringify({
+            type: 'knowAboutExistance',
+        })
+    ),
+    justBoots: Markup.button.callback(
+        "👟 Только ботинки",
+        stringify({
+            type: 'selectSet',
+            data: {
+                set: AvailableSets.justBoots,
+            }
+        })
+    ),
+    justSkis: Markup.button.callback(
+        "🎿 Только лыжи",
+        stringify({
+            type: 'selectSet',
+            data: {
+                set: AvailableSets.justSkis,
+            }
+        })
+    ),
+    fullSet: Markup.button.callback(
+        "🎿👟 Полный комплект",
+        stringify({
+            type: 'selectSet',
+            data: {
+                set: AvailableSets.fullSet,
+            }
+        })
+    ),
+    selectRentalPeriod: (text: string, value: RentalPeriod) => {
+        return Markup.button.callback(
+            text,
+            stringify({
+                type: 'selectRentalPeriod',
+                data: {
+                    period: value,
+                }
+            })
+        )
+    },
+    payForRental: Markup.button.callback(
+        "💳 Оплатить аренду",
+        stringify({
+            type: 'payForRental',
+        })
+    ),
+    skiSharpening: Markup.button.callback(
+        "🔪 Заточка лыж",
+        stringify({
+            type: 'prepCost',
+            data: {
+                t: PreparationType.skiSharpening,
+            }
+        })
+    ),
+    bootMachining: Markup.button.callback(
+        "🔧 Обработка ботинок",
+        stringify({
+            type: 'prepCost',
+            data: {
+                t: PreparationType.bootMachining,
+            }
+        })
+    ),
+    payForPreparation: Markup.button.callback(
+        "💳 Оплатить подготовку",
+        stringify({
+            type: 'payForPreparation',
+        })
+    ),
+}
+
 export const buttonsList =  {
+    ...equipmentButtons,
     backButton: (type: string, data?: any) => {
         return Markup.button.callback(
             '⬅️ Назад',
@@ -30,13 +133,19 @@ export const buttonsList =  {
     rentSki: Markup.button.callback(
         "🎿 Прокат лыж и инвентаря",
         stringify({
-            type: 'rentSki',
+            type: 'rentEquipment',
         })
     ),
     manageBooking: Markup.button.callback(
         "📆 Управление записями",
         stringify({
             type: 'manageBookings',
+        })
+    ),
+    additionalInformation: Markup.button.callback(
+        "❗ Дополнительно",
+        stringify({
+            type: 'additionalInformation',
         })
     ),
     groupTraining: Markup.button.callback(

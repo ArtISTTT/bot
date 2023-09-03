@@ -7,7 +7,8 @@ export const commandOnStart = (ctx: IBotContext) => {
     bot.telegram.sendMessage((ctx as any).chat.id, 'Добро пожаловать! Что вас интересует?', Markup.inlineKeyboard([
             [buttonsList.bookTraining],
             [buttonsList.rentSki],
-            [buttonsList.manageBooking]
+            [buttonsList.manageBooking],
+            [buttonsList.additionalInformation],
         ])
     )
 }

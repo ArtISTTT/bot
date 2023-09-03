@@ -230,6 +230,6 @@ export const payForGroupTraining = (ctx: IBotContext) => {
 
     bot.telegram.sendMessage((ctx as any).chat.id, `Тренировка оплачена!`, Markup.inlineKeyboard([
         [buttonsList.goToStart],
-        [buttonsList.backButton('confirmGroupTraining')]
+        [buttonsList.backButton('goToStart')]
     ]))
 }
