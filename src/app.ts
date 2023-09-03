@@ -33,6 +33,10 @@ bot.action(/.*/, async (ctx: any) => {
 
         const handler = commands[callbackData.type];
 
+        console.log(ctx.chat.id, ctx.update.callback_query.message)
+
+        ctx.tg.deleteMessage(ctx.chat.id, ctx.update.callback_query.message.message_id)
+
         handler(ctx, callbackData.data)
     } else {
         const handler = (commands as any)[callbackData];

@@ -14,6 +14,7 @@ export const bookTraining = (ctx: Context) => {
     bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите тип тренировки', Markup.inlineKeyboard([
         [buttonsList.groupTraining],
         [buttonsList.individualTraining],
+        [buttonsList.backButton('goToStart')],
     ]))
 }
 
@@ -27,7 +28,8 @@ export const individualTraining = (ctx: IBotContext) => {
             inline_keyboard: [
                 availableTrainers.map((trainer) => {
                     return buttonsList.selectTrainer(trainer.id)
-                })
+                }),
+                [buttonsList.backButton('bookTraining')],
             ]
         }
     })
@@ -44,6 +46,7 @@ export const informationAboutTrainer = (ctx: IBotContext, data: {trainerId: numb
     bot.telegram.sendMessage((ctx as any).chat.id, trainer?.info ?? 'Информация не найдена', Markup.inlineKeyboard([
         [buttonsList.selectTrainingDate(data.trainerId)],
         [buttonsList.selectAnotherTrainer],
+        [buttonsList.backButton('individualTraining', data)],
     ]))
 }
 
@@ -61,7 +64,7 @@ export const selectTrainingDate = (ctx: IBotContext, data: {trainerId: number}) 
 
     const availableDateButtons = availableDates.map(date => [buttonsList.availableDateButton(date)])
 
-    bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите ближайшую дату тренировки:', Markup.inlineKeyboard(availableDateButtons))
+    bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите ближайшую дату тренировки:', Markup.inlineKeyboard(availableDateButtons.concat([[buttonsList.backButton('informationAboutTrainer', data)]])))
 }
 
 // При клике на кнопку на Дату тренировки открывается меню выбора времени тренировки
@@ -90,7 +93,7 @@ export const selectAvailableDate = (ctx: IBotContext, data: {trainerId: number, 
             [buttonsList.goToStart],
         ]));
     } else {
-        bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите время тренировки:', Markup.inlineKeyboard(availableTimeButtons));
+        bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите время тренировки:', Markup.inlineKeyboard(availableTimeButtons.concat([[buttonsList.backButton('selectTrainingDate', data)]])));
     }
 }
 
@@ -103,6 +106,7 @@ export const selectAvailableTime = (ctx: IBotContext, data: {time: number}) => {
 
     bot.telegram.sendMessage((ctx as any).chat.id, `Вы выбрали ${ctx.session.currentDate?.format('dddd, D MMMM')} в ${data.time}:00`, Markup.inlineKeyboard([
         [buttonsList.confirmIndividualTraining],
+        [buttonsList.backButton('selectAvailableDate', data)]
     ]))
 }
 
@@ -120,6 +124,7 @@ export const confirmIndividualTraining = (ctx: IBotContext) => {
 
     bot.telegram.sendMessage((ctx as any).chat.id, `Подтверждено! Оплатите тренировку`, Markup.inlineKeyboard([
         [buttonsList.payForIndividualTraining],
+        [buttonsList.backButton('selectAvailableTime')]
     ]));
 }
 
@@ -137,6 +142,7 @@ export const payForIndividualTraining = (ctx: IBotContext) => {
 
     bot.telegram.sendMessage((ctx as any).chat.id, `Тренировка оплачена!`, Markup.inlineKeyboard([
         [buttonsList.goToStart],
+        [buttonsList.backButton('confirmIndividualTraining')]
     ]))
 }
 
@@ -157,7 +163,9 @@ export const groupTraining = (ctx: IBotContext) => {
     }
 
 
-    const availableDateButtons = availableDates.map(date => [buttonsList.availableGroupDateButton(date)])
+    const availableDateButtons = availableDates.map(date => [buttonsList.availableGroupDateButton(date)]).concat([[buttonsList.backButton('bookTraining')]]);
+
+    console.log(availableDateButtons);
 
     bot.telegram.sendMessage((ctx as any).chat.id, 'Тренировки проводятся ежедневно в 10:00, 13:00, 18:00 и 20:00. Выберите желаемую дату:', Markup.inlineKeyboard(availableDateButtons))
 }
@@ -170,7 +178,7 @@ export const selectAvailableGroupDate = (ctx: IBotContext, data: {date: string})
 
     const availableTimeButtons = availableTimes.map(time => [buttonsList.availableGroupTimeButton(time.time, time.free)])
 
-    bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите время тренировки:', Markup.inlineKeyboard(availableTimeButtons))
+    bot.telegram.sendMessage((ctx as any).chat.id, 'Выберите время тренировки:', Markup.inlineKeyboard(availableTimeButtons.concat([[buttonsList.backButton('groupTraining', data)]])))
 
 }
 
@@ -179,12 +187,14 @@ export const selectAvailableGroupTime = (ctx: IBotContext, data: {time: number})
 
     bot.telegram.sendMessage((ctx as any).chat.id, `Вы выбрали ${ctx.session.currentDate?.format('dddd, D MMMM')} в ${data.time}:00`, Markup.inlineKeyboard([
         [buttonsList.confirmGroupTraining],
+        [buttonsList.backButton('selectAvailableGroupDate', data)]
     ]))
 }
 
 export const selectAvailableGroupTimeNotAble = (ctx: IBotContext, data: {time: number, able: boolean}) => {
     bot.telegram.sendMessage((ctx as any).chat.id, `Свободных мест нет. Вам прийдет уведомление если они появятся`, Markup.inlineKeyboard([
         [buttonsList.goToStart],
+        [buttonsList.backButton('selectAvailableGroupDate', data)]
     ]))
 }
 
@@ -202,6 +212,7 @@ export const confirmGroupTraining = (ctx: IBotContext) => {
 
     bot.telegram.sendMessage((ctx as any).chat.id, `Подтверждено! Оплатите групповую тренировку`, Markup.inlineKeyboard([
         [buttonsList.payForGroupTraining],
+        [buttonsList.backButton('selectAvailableGroupDate')]
     ]));
 }
 
@@ -219,5 +230,6 @@ export const payForGroupTraining = (ctx: IBotContext) => {
 
     bot.telegram.sendMessage((ctx as any).chat.id, `Тренировка оплачена!`, Markup.inlineKeyboard([
         [buttonsList.goToStart],
+        [buttonsList.backButton('confirmGroupTraining')]
     ]))
 }

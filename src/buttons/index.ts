@@ -9,6 +9,15 @@ const stringify = (data: any) => {
 const byteSize = (str: string) => new Blob([str]).size;
 
 export const buttonsList =  {
+    backButton: (type: string, data?: any) => {
+        return Markup.button.callback(
+            '⬅️ Назад',
+            stringify({
+                type,
+                data
+            })
+        )
+    },
     bookTraining: Markup.button.callback(
         "📝 Записаться на тренировку",
         stringify({
