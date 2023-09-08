@@ -110,8 +110,30 @@ const equipmentButtons = {
     ),
 }
 
+const manageButtons = {
+    checkBookings: Markup.button.callback(
+        "📆 Просмотр записей на тренировки",
+        stringify({
+            type: 'checkBookings',
+        })
+    ),
+    checkRentals: Markup.button.callback(
+        "📆 Просмотр арендованого снаряжения",
+        stringify({
+            type: 'checkRentals',
+        })
+    ),
+    checkPreparations: Markup.button.callback(
+        "📆 Просмотр инвентаря на подготовку",
+        stringify({
+            type: 'checkPreparations',
+        })
+    )
+}
+
 export const buttonsList =  {
     ...equipmentButtons,
+    ...manageButtons,
     backButton: (type: string, data?: any) => {
         return Markup.button.callback(
             '⬅️ Назад',

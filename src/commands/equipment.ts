@@ -16,6 +16,40 @@ const prepTypeToText = {
     [PreparationType.bootMachining]: 'Обработка ботинок',
 }
 
+const periodValueToText = {
+    [RentalPeriod.twoHours]: '2 часа',
+    [RentalPeriod.fourHours]: '4 часа',
+    [RentalPeriod.oneDay]: '1 день',
+    [RentalPeriod.twoDays]: '2 дня',
+}
+
+const rentTypeToText = {
+    [AvailableSets.justBoots]: 'Ботинки',
+    [AvailableSets.justSkis]: 'Лыжи',
+    [AvailableSets.fullSet]: 'Полный комплект',
+}
+
+const rentTypeAndSetToCost = {
+    [AvailableSets.justBoots]: {
+        [RentalPeriod.twoHours]: 300,
+        [RentalPeriod.fourHours]: 500,
+        [RentalPeriod.oneDay]: 1000,
+        [RentalPeriod.twoDays]: 1500,
+    },
+    [AvailableSets.justSkis]: {
+        [RentalPeriod.twoHours]: 400,
+        [RentalPeriod.fourHours]: 600,
+        [RentalPeriod.oneDay]: 1100,
+        [RentalPeriod.twoDays]: 1700,
+    },
+    [AvailableSets.fullSet]: {
+        [RentalPeriod.twoHours]: 500,
+        [RentalPeriod.fourHours]: 800,
+        [RentalPeriod.oneDay]: 1500,
+        [RentalPeriod.twoDays]: 2000,
+    }
+}
+
 
 // При клике на кнопку "Прокат лыжь и инвентаря" открывается меню выбора типа тренировки
 export const rentEquipment = (ctx: Context) => {
@@ -60,18 +94,7 @@ export const selectSet = (ctx: IBotContext, data: {set: AvailableSets}) => {
 export const selectRentalPeriod = (ctx: IBotContext, data: {period: RentalPeriod}) => {
     ctx.session.rentalPeriod = data.period;
 
-    const periodValueToText = {
-        [RentalPeriod.twoHours]: '2 часа',
-        [RentalPeriod.fourHours]: '4 часа',
-        [RentalPeriod.oneDay]: '1 день',
-        [RentalPeriod.twoDays]: '2 дня',
-    }
-
-    const rentTypeToText = {
-        [AvailableSets.justBoots]: 'Ботинки',
-        [AvailableSets.justSkis]: 'Лыжи',
-        [AvailableSets.fullSet]: 'Полный комплект',
-    }
+    
 
     const type = ctx.session.set;
     const period = ctx.session.rentalPeriod;
@@ -84,14 +107,44 @@ export const selectRentalPeriod = (ctx: IBotContext, data: {period: RentalPeriod
         return;
     }
 
-    bot.telegram.sendMessage((ctx as any).chat.id, `Оплатите аренду за ${rentTypeToText[type]} на ${periodValueToText[period]}`, Markup.inlineKeyboard([
+    bot.telegram.sendMessage((ctx as any).chat.id, `Оплатите ${rentTypeAndSetToCost[type][period]} аренду за ${rentTypeToText[type]} на ${periodValueToText[period]}`, Markup.inlineKeyboard([
         [buttonsList.payForRental],
         [buttonsList.backButton('selectRentalPeriod', data)]
     ]));
 }
 
 export const payForRental = (ctx: IBotContext) => {
-    bot.telegram.sendMessage((ctx as any).chat.id, `Оплачено!`, Markup.inlineKeyboard([
+    const {rentalPeriod, set} = ctx.session;
+
+    if (!rentalPeriod || !set) {
+        bot.telegram.sendMessage((ctx as any).chat.id, `Ошибка`, Markup.inlineKeyboard([
+            [buttonsList.backButton('goToStart')]
+        ]));
+
+        return;
+    }
+
+    if (ctx.session.rentals ) {
+        ctx.session.rentals = [
+            ...ctx.session.rentals,
+            {
+                set,
+                period: rentalPeriod,
+                isPayed: true,
+                cost: rentTypeAndSetToCost[set][rentalPeriod]
+            }
+        ]
+    } else {
+        ctx.session.rentals = [
+            {
+                set,
+                period: rentalPeriod,
+                isPayed: true,
+                cost: rentTypeAndSetToCost[set][rentalPeriod]
+            }
+        ]
+    }
+    bot.telegram.sendMessage((ctx as any).chat.id, `Аренда оплачена!`, Markup.inlineKeyboard([
         [buttonsList.backButton('goToStart')]
     ]));
 }
@@ -134,6 +187,25 @@ export const payForPreparation = (ctx: IBotContext) => {
         ]));
 
         return;
+    }
+
+    if (ctx.session.preparations ) {
+        ctx.session.preparations = [
+            ...ctx.session.preparations,
+            {
+                type,
+                cost: prepTypeToCost[type],
+                isPayed: true,
+            }
+        ]
+    } else {
+        ctx.session.preparations = [
+            {
+                type,
+                cost: prepTypeToCost[type],
+                isPayed: true,
+            }
+        ]
     }
 
     bot.telegram.sendMessage((ctx as any).chat.id, `Поздравляем! Вы оплатили ${prepTypeToCost[type]} рублей за ${prepTypeToText[type]}!`, Markup.inlineKeyboard([

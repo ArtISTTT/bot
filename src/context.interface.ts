@@ -27,6 +27,17 @@ export interface SessionData {
         isPayed: boolean;
         id: string;
     }[];
+    rentals?: {
+        set: AvailableSets;
+        period: RentalPeriod;
+        cost: number;
+        isPayed: boolean;
+    }[],
+    preparations?: {
+        type: PreparationType,
+        cost: number;
+        isPayed: boolean;
+    }[],
     currentPayingTrainingId?: string;
     set?: AvailableSets,
     rentalPeriod?: RentalPeriod,
