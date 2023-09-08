@@ -131,9 +131,31 @@ const manageButtons = {
     )
 }
 
+const additional = {
+    reviews: Markup.button.callback(
+        "📝 Отзывы",
+        stringify({
+            type: 'reviews',
+        })
+    ),
+    support: Markup.button.callback(
+        "📞 Поддержки",
+        stringify({
+            type: 'support',
+        })
+    ),
+    contacts: Markup.button.callback(
+        "📞 Контакты",
+        stringify({
+            type: 'contacts',
+        })
+    )
+}
+
 export const buttonsList =  {
     ...equipmentButtons,
     ...manageButtons,
+    ...additional,
     backButton: (type: string, data?: any) => {
         return Markup.button.callback(
             '⬅️ Назад',
